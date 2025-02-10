@@ -1,73 +1,20 @@
-// import React from "react";
-// import { HiOutlineArrowSmRight } from "react-icons/hi";
-
-// const HeroPage = () => {
-//   return (
-//     <div className="container w-[100%] flex justify-center items-center flex-col mt-[20px]">
-//       <div className="containerWrap w-[100%] max-w-[1300px] flex justify-between items-center">
-//         <div className="h-[500px] w-full flex justify-between items-center max-lg:flex-col max-sm:justify-center max-sm:items-center">
-//           <div className="heroContent w-[40%] max-sm:w-[85%] max-sm:flex-col max-sm:justify-center max-sm:items-center max-sm:text-center">
-//             <h3 className="text-3xl py-2 max-sm:text-[16px] font-semibold">
-//               Welcome to the
-//             </h3>
-//             <h1 className="text-7xl font-semibold max-sm:text-[34px]">
-//               Classic Ice Cream Parlor
-//             </h1>
-//             <p className="text-2xl py-2 leading-6 space-x-8 max-sm:text-[14px] max-sm:font-semibold max-sm:leading-4">
-//               Savor the taste of traditional ice cream made with love and
-//               quality ingredients.
-//             </p>
-//             <div className="flex justify-center items-center py-4">
-//               <button className="w-64 bg-amber-300 py-3 rounded-4xl px-4 flex justify-between items-center">
-//                 Browse Our Classic Flavors <HiOutlineArrowSmRight />
-//               </button>
-//             </div>
-//           </div>
-//           <div className="heroPhoto w-[40%] max-sm:w-64 py-4">
-//             <img
-//               className="w-full object-cover"
-//               src="https://html.designingmedia.com/icedelight/assets/images/banner-image.png"
-//               alt=""
-//             />
-//           </div>
-//         </div>
-//       </div>
-//     </div>
-//   );
-// };
-
-// export default HeroPage;
-
-import React from "react";
-
+import React, { useEffect, useState } from "react";
+import axios from "axios";
+import {Phone} from '../iphone'
 const HomeUi = () => {
-  const products = [
-    {
-      name: "French Vanilla Ice Cream",
-      price: "$4.99",
-      originalPrice: "$5.99",
-      image: "/api/placeholder/100/100",
-    },
-    {
-      name: "Chocolate Supreme",
-      price: "$5.99",
-      originalPrice: "$6.99",
-      image: "/api/placeholder/100/100",
-    },
-    {
-      name: "Strawberry Delight",
-      price: "$4.99",
-      originalPrice: "$5.99",
-      image: "/api/placeholder/100/100",
-    },
-    {
-      name: "Mint Chocolate",
-      price: "$5.99",
-      originalPrice: "$6.99",
-      image: "/api/placeholder/100/100",
-    },
-  ];
+  const [products, setProduct] = useState([]);
 
+  useEffect(() => {
+    const productFatch = () => {
+      try {
+        const response = axios.get("/products");
+        setProduct(response.Data.Data);
+      } catch (error) {
+        console.log(error, "error in product fatching from backend");
+      }
+    };
+    productFatch();
+  });
   return (
     <>
       <div className="min-h-screen bg-pink-50">
@@ -92,42 +39,15 @@ const HomeUi = () => {
             </div>
 
             <div className="heroPhoto w-[40%] max-sm:w-64 py-4">
-              <img
+<Phone />
+              {/* <img
                 className="w-full object-cover"
                 src="https://html.designingmedia.com/icedelight/assets/images/banner-image.png"
                 alt=""
-              />
+              /> */}
             </div>
           </div>
         </div>
-
-        {/* Feature Section */}
-        {/* <div className="px-4 py-12 md:px-6 lg:px-8 xl:px-12">
-        <div className="flex flex-col md:flex-row items-center gap-8">
-          <div className="w-full md:w-1/2">
-            <img 
-              src="/api/placeholder/400/400" 
-              alt="Person enjoying ice cream" 
-              className="rounded-2xl w-full"
-            />
-          </div>
-          
-          <div className="w-full md:w-1/2 text-center md:text-left">
-            <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold mb-4">
-              Relive the Sweet
-              <span className="block">Memories of <span className="text-pink-500">Classic</span></span>
-              <span className="block">Ice Creams</span>
-            </h2>
-            <p className="text-gray-600 mb-6 text-sm md:text-base">
-              From the most memorable flavors to today's creative new combinations,
-              each scoop tells a story worth sharing.
-            </p>
-            <button className="bg-purple-600 text-white px-6 py-3 rounded-full text-sm md:text-base">
-              Explore More
-            </button>
-          </div>
-        </div>
-      </div> */}
 
         {/* Products Section */}
         <div className="px-4 py-12 md:px-6 lg:px-8 xl:px-12">

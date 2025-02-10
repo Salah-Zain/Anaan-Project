@@ -1,13 +1,18 @@
 import React from "react";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import NavBar from "./components/navBar";
-import HeroPage from "./components/sectionOne";
+import HeroPage from "./components/sectionOne"; // ProductPage
+import Form from "./components/form";
 
 const App = () => {
   return (
-    <div>
+    <Router>
       <NavBar />
-      <HeroPage />
-    </div>
+      <Routes>
+        <Route path="/" element={<HeroPage />} />  {/* Product Page */}
+        <Route path="/form" element={<Form />} />  {/* Form Page */}
+      </Routes>
+    </Router>
   );
 };
 
