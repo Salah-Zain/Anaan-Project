@@ -1,20 +1,22 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import {Phone} from '../iphone'
+import { Phone } from "../iphone";
+import Navbar from '../navBar'
 const HomeUi = () => {
-  const [products, setProduct] = useState([]);
+  const [products, setProducts] = useState([]);
 
   useEffect(() => {
-    const productFatch = () => {
+    const fetchProducts = async () => {
       try {
-        const response = axios.get("/products");
-        setProduct(response.Data.Data);
+        const response = await axios.get("http://localhost:7000/products");
+        // setProducts(response.data.Data);
       } catch (error) {
-        console.log(error, "error in product fatching from backend");
+        console.error("Error fetching products from backend:", error);
       }
     };
-    productFatch();
-  });
+
+    fetchProducts();
+  }, []);
   return (
     <>
       <div className="min-h-screen bg-pink-50">
@@ -33,18 +35,13 @@ const HomeUi = () => {
                 Savor the taste of tradition in our house-made with love and
                 quality ingredients.
               </p>
-              <button className="bg-purple-600 text-white px-6 py-3 rounded-full text-sm md:text-base">
+              <button className="border-purple-600 border text-purple-600  hover:bg-purple-600 hover:text-white  px-6 py-3 rounded-full text-sm md:text-base">
                 Browse Our Flavors Now
               </button>
             </div>
 
             <div className="heroPhoto w-[40%] max-sm:w-64 py-4">
-<Phone />
-              {/* <img
-                className="w-full object-cover"
-                src="https://html.designingmedia.com/icedelight/assets/images/banner-image.png"
-                alt=""
-              /> */}
+              <Phone />
             </div>
           </div>
         </div>

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Camera } from 'lucide-react';
+import axios from 'axios';
 
 const ProductForm = () => {
   const [formData, setFormData] = useState({
@@ -7,36 +8,60 @@ const ProductForm = () => {
     price: '',
     image: null
   });
-  
+
   const [previewUrl, setPreviewUrl] = useState('');
-  
+  const [errorMessage, setErrorMessage] = useState('');
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
       [name]: value
     }));
   };
-  
+
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      setFormData(prev => ({
+      setFormData((prev) => ({
         ...prev,
         image: file
       }));
-      // Create preview URL
       const url = URL.createObjectURL(file);
       setPreviewUrl(url);
     }
   };
-  
-  const handleSubmit = (e) => {
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // Ensure required fields are filled
+    if (!formData.name || !formData.price || !formData.image) {
+      setErrorMessage("All fields are required.");
+      return;
+    }
+
+    const data = new FormData(); // Avoid name conflict with state variable
+    data.append("name", formData.name);
+    data.append("price", formData.price);
+    data.append("image", formData.image);
+
     console.log('Form submitted:', formData);
-    // Handle form submission here
+
+    try {
+      const response = await axios.post('http://localhost:7000/addproduct', data, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+      console.log(response.data, 'data received');
+      setErrorMessage(""); // Clear errors on successful submission
+    } catch (error) {
+      console.error("Error submitting form:", error.response ? error.response.data : error.message);
+      setErrorMessage(error.response?.data?.message || "Something went wrong. Please try again.");
+    }
   };
-  
+
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8">
@@ -45,7 +70,11 @@ const ProductForm = () => {
             Add New Product
           </h2>
         </div>
-        
+
+        {errorMessage && (
+          <div className="text-red-500 text-center">{errorMessage}</div>
+        )}
+
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
           <div className="rounded-md shadow-sm space-y-4">
             {/* Name Input */}
@@ -58,13 +87,13 @@ const ProductForm = () => {
                 name="name"
                 type="text"
                 required
-                className="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
                 placeholder="Enter product name"
                 value={formData.name}
                 onChange={handleInputChange}
               />
             </div>
-            
+
             {/* Price Input */}
             <div>
               <label htmlFor="price" className="block text-sm font-medium text-gray-700">
@@ -79,7 +108,7 @@ const ProductForm = () => {
                   name="price"
                   type="number"
                   required
-                  className="pl-7 mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+                  className="pl-7 mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
                   placeholder="0.00"
                   value={formData.price}
                   onChange={handleInputChange}
@@ -88,13 +117,13 @@ const ProductForm = () => {
                 />
               </div>
             </div>
-            
+
             {/* Image Upload */}
             <div>
               <label className="block text-sm font-medium text-gray-700">
                 Product Image
               </label>
-              <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md hover:border-indigo-500 transition-colors duration-200">
+              <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md hover:border-indigo-500">
                 <div className="space-y-1 text-center">
                   {previewUrl ? (
                     <img
@@ -106,7 +135,7 @@ const ProductForm = () => {
                     <Camera className="mx-auto h-12 w-12 text-gray-400" />
                   )}
                   <div className="flex text-sm text-gray-600">
-                    <label htmlFor="image" className="relative cursor-pointer bg-white rounded-md font-medium text-indigo-600 hover:text-indigo-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-indigo-500">
+                    <label htmlFor="image" className="cursor-pointer bg-white rounded-md font-medium text-indigo-600 hover:text-indigo-500">
                       <span>Upload a file</span>
                       <input
                         id="image"
@@ -126,15 +155,17 @@ const ProductForm = () => {
               </div>
             </div>
           </div>
-          
+
+          {/* Submit Button */}
           <div>
             <button
               type="submit"
-              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors duration-200"
+              className="w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700"
             >
               Submit
             </button>
           </div>
+
         </form>
       </div>
     </div>
