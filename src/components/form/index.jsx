@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { Camera } from 'lucide-react';
-import axios from 'axios';
+import { ArrowLeft, Camera } from 'lucide-react';
+import Swal from 'sweetalert2';
 
 const ProductForm = () => {
   const [formData, setFormData] = useState({
@@ -35,38 +35,61 @@ const ProductForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Ensure required fields are filled
     if (!formData.name || !formData.price || !formData.image) {
       setErrorMessage("All fields are required.");
       return;
     }
 
-    const data = new FormData(); // Avoid name conflict with state variable
+    const data = new FormData();
     data.append("name", formData.name);
     data.append("price", formData.price);
     data.append("image", formData.image);
 
-    console.log('Form submitted:', formData);
-
     try {
-      const response = await axios.post('http://localhost:7000/addproduct', data, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
+      const response = await fetch('http://localhost:7000/addproduct', {
+        method: 'POST',
+        body: data
       });
-      console.log(response.data, 'data received');
-      setErrorMessage(""); // Clear errors on successful submission
+      const responseData = await response.json();
+      console.log(responseData, 'data received');
+      setErrorMessage("");
+      
+      // Show success message with SweetAlert2
+      Swal.fire({
+        title: 'Success!',
+        text: 'Product added successfully',
+        icon: 'success',
+        timer: 1500,
+        showConfirmButton: false
+      }).then(() => {
+        window.location.href = '/anu/adminhome';
+      });
     } catch (error) {
-      console.error("Error submitting form:", error.response ? error.response.data : error.message);
-      setErrorMessage(error.response?.data?.message || "Something went wrong. Please try again.");
+      console.error("Error submitting form:", error);
+      Swal.fire({
+        title: 'Error!',
+        text: 'Something went wrong. Please try again.',
+        icon: 'error',
+        confirmButtonText: 'OK'
+      });
     }
+  };
+
+  const handleBack = () => {
+    window.history.back();
   };
 
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8">
-        <div>
-          <h2 className="mt-6 text-center font-light text-3xl  text-gray-900">
+        <div className="relative">
+          <button
+            onClick={handleBack}
+            className="absolute left-0 top-0 py-2 px-4 border border-transparent text-sm font-medium rounded-md text-gray-600 bg-gray-100 hover:bg-gray-200"
+          >
+            <ArrowLeft />
+          </button>
+          <h2 className="mt-6 text-center font-light text-3xl text-gray-900">
             Add New Product
           </h2>
         </div>
@@ -165,7 +188,6 @@ const ProductForm = () => {
               Submit
             </button>
           </div>
-
         </form>
       </div>
     </div>

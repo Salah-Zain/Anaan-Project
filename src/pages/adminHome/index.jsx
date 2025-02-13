@@ -2,10 +2,12 @@ import { React, useEffect, useState } from "react";
 import { Plus, Edit2, Package, Search, Filter, Trash } from "lucide-react";
 import { Link } from "react-router-dom";
 import axios from "axios";
+import Swal from 'sweetalert2';
 
 const ProductManagement = () => {
   const [products, setProducts] = useState([]);
   const [isMobileView, setIsMobileView] = useState(false);
+  const [deleteError, setDeleteError] = useState(null);
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -26,8 +28,47 @@ const ProductManagement = () => {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
+  // Delete function with SweetAlert
+  const handleDelete = async (productId) => {
+    try {
+      const result = await Swal.fire({
+        title: 'Are you sure?',
+        text: "You won't be able to revert this!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Yes, delete it!'
+      });
+
+      if (result.isConfirmed) {
+        const response = await axios.delete(`http://localhost:7000/delete-product/${productId}`);
+
+        if (response.data.success) {
+          setProducts(products.filter(product => product._id !== productId));
+          Swal.fire(
+            'Deleted!',
+            'Your product has been deleted.',
+            'success'
+          );
+        } else {
+          throw new Error(response.data.message || "Failed to delete product.");
+        }
+      }
+    } catch (error) {
+      console.error("Error deleting product:", error);
+      Swal.fire(
+        'Error!',
+        error.message || "Failed to delete product. Please try again.",
+        'error'
+      );
+      setDeleteError(error.message || "Failed to delete product. Please try again.");
+    }
+  };
+
   return (
     <div className="p-4 md:p-6 w-full max-w-6xl mx-auto">
+      {/* Rest of the component remains the same */}
       {/* Header Section */}
       <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-6 md:mb-8">
         <Link to="/">
@@ -85,7 +126,10 @@ const ProductManagement = () => {
                       <Edit2 className="w-4 h-4" />
                       Edit
                     </button>
-                    <button className="flex-1 text-red-600 hover:text-red-800 flex items-center justify-center gap-1 py-2 border rounded">
+                    <button
+                      onClick={() => handleDelete(product._id)}
+                      className="flex-1 text-red-600 hover:text-red-800 flex items-center justify-center gap-1 py-2 border rounded"
+                    >
                       <Trash className="w-4 h-4" />
                       Delete
                     </button>
@@ -136,7 +180,10 @@ const ProductManagement = () => {
                           <Edit2 className="w-4 h-4" />
                           Edit
                         </button>
-                        <button className="text-red-600 hover:text-red-800 flex items-center gap-1">
+                        <button
+                          onClick={() => handleDelete(product._id)}
+                          className="text-red-600 hover:text-red-800 flex items-center gap-1"
+                        >
                           <Trash className="w-4 h-4" />
                           Delete
                         </button>
@@ -149,6 +196,8 @@ const ProductManagement = () => {
           </div>
         )}
       </div>
+
+      {deleteError && <p className="text-red-500 mt-4">{deleteError}</p>}
     </div>
   );
 };
