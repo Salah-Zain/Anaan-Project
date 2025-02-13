@@ -56,30 +56,34 @@ const HomeUi = () => {
             Our <span className="text-pink-500">Classic</span> Favorites
           </h2>
 
-          <div className=" bg-red-600 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="  grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {products.map((product, index) => (
-              <div key={index} className="bg-white rounded-xl p-4 shadow-lg">
-                <img
-                  src={`http://localhost:7000${product.img}`}
-
-                  alt={product.name}
-                  className="w-full h-48 object-cover rounded-lg mb-4"
-                />
-                <h3 className="font-semibold mb-2">{product.name}</h3>
-                <div className="flex justify-between items-center mb-4">
-                  <div>
-                    <span className="text-purple-600 font-bold">
-                      {product.price}
-                    </span>
-                    <span className="text-gray-400 line-through text-sm ml-2">
-                      {product.originalPrice}
-                    </span>
-                  </div>
-                  <button className="bg-purple-600 text-white px-4 py-2 rounded-full text-sm">
-                    Add
-                  </button>
-                </div>
-              </div>
+             <div 
+             key={index} 
+             className="bg-white rounded-xl p-4 shadow-lg transition-all duration-300 hover:shadow-xl hover:scale-105"
+           >
+             <div className="overflow-hidden rounded-lg">
+               <img
+                 src={`http://localhost:7000${product.img}`}
+                 alt={product.name}
+                 className="w-full h-48 object-cover rounded-lg mb-4 transition-transform duration-300 hover:scale-110"
+               />
+             </div>
+             <h3 className="font-semibold mb-2">{product.name}</h3>
+             <div className="flex justify-between items-center mb-4">
+               <div>
+                 <span className="text-purple-600 font-bold">
+                   {product.price}
+                 </span>
+                 <span className="text-gray-400 line-through text-sm ml-2">
+                   {product.originalPrice}
+                 </span>
+               </div>
+               <button className="bg-purple-600 text-white px-4 py-2 rounded-full text-sm transition-colors duration-300 hover:bg-purple-700">
+                 Add
+               </button>
+             </div>
+           </div>
             ))}
           </div>
         </div>
