@@ -23,7 +23,7 @@ const HomeUi = () => {
   return (
     <>
     <Navbar/>
-      <div className="min-h-screen  font-Embed bg-pink-50">
+      <div className="min-h-screen  mt-5 font-Embed bg-pink-50">
         {/* Hero Section */}
         <div className="px-4 py-8 md:px-6 lg:px-8 xl:px-12">
           <div className="flex flex-col lg:flex-row items-center justify-between">
