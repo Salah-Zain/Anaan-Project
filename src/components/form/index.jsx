@@ -1,20 +1,8 @@
 import React, { useState } from 'react';
 import { Camera } from 'lucide-react';
-import Swal from 'sweetalert2';
-import { useNavigate } from 'react-router-dom';
-
-const Alert = ({ type, message }) => {
-  if (!message || type === 'success') return null;
-  
-  return (
-    <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative">
-      {message}
-    </div>
-  );
-};
+import axios from 'axios';
 
 const ProductForm = () => {
-  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     name: '',
     price: '',
@@ -22,7 +10,7 @@ const ProductForm = () => {
   });
 
   const [previewUrl, setPreviewUrl] = useState('');
-  const [alert, setAlert] = useState({ type: '', message: '' });
+  const [errorMessage, setErrorMessage] = useState('');
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -35,14 +23,6 @@ const ProductForm = () => {
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      if (file.size > 10 * 1024 * 1024) {
-        setAlert({
-          type: 'error',
-          message: "File size must be less than 10MB"
-        });
-        return;
-      }
-      
       setFormData((prev) => ({
         ...prev,
         image: file
@@ -54,43 +34,31 @@ const ProductForm = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setAlert({ type: '', message: '' });
-  
-    // Validation
+
+    // Ensure required fields are filled
     if (!formData.name || !formData.price || !formData.image) {
-      setAlert({
-        type: 'error',
-        message: "All fields are required."
-      });
+      setErrorMessage("All fields are required.");
       return;
     }
-  
+
+    const data = new FormData(); // Avoid name conflict with state variable
+    data.append("name", formData.name);
+    data.append("price", formData.price);
+    data.append("image", formData.image);
+
+    console.log('Form submitted:', formData);
+
     try {
-      // In a real application, you would send the data to your server here
-      // For now, we'll simulate a successful submission
-      
-      // Show success message with SweetAlert2
-      Swal.fire({
-        title: "Success!",
-        text: "Product added successfully!",
-        icon: "success",
-        showConfirmButton: false,
-        timer: 2000
+      const response = await axios.post('http://localhost:7000/addproduct', data, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
       });
-      
-      setFormData({ name: '', price: '', image: null });
-      setPreviewUrl('');
-      
-      // Navigate to home page after success
-      setTimeout(() => {
-        navigate('/');
-      }, 2000);
-      
+      console.log(response.data, 'data received');
+      setErrorMessage(""); // Clear errors on successful submission
     } catch (error) {
-      setAlert({
-        type: 'error',
-        message: error.response?.data?.message || "Something went wrong. Please try again."
-      });
+      console.error("Error submitting form:", error.response ? error.response.data : error.message);
+      setErrorMessage(error.response?.data?.message || "Something went wrong. Please try again.");
     }
   };
 
@@ -98,15 +66,18 @@ const ProductForm = () => {
     <div className="min-h-screen bg-gray-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8">
         <div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
+          <h2 className="mt-6 text-center font-light text-3xl  text-gray-900">
             Add New Product
           </h2>
         </div>
 
-        <Alert type={alert.type} message={alert.message} />
+        {errorMessage && (
+          <div className="text-red-500 text-center">{errorMessage}</div>
+        )}
 
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
           <div className="rounded-md shadow-sm space-y-4">
+            {/* Name Input */}
             <div>
               <label htmlFor="name" className="block text-sm font-medium text-gray-700">
                 Product Name
@@ -123,6 +94,7 @@ const ProductForm = () => {
               />
             </div>
 
+            {/* Price Input */}
             <div>
               <label htmlFor="price" className="block text-sm font-medium text-gray-700">
                 Price
@@ -137,7 +109,7 @@ const ProductForm = () => {
                   type="number"
                   required
                   className="pl-7 mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
-                  placeholder="0.00"
+                  placeholder="200 rs"
                   value={formData.price}
                   onChange={handleInputChange}
                   min="0"
@@ -146,6 +118,7 @@ const ProductForm = () => {
               </div>
             </div>
 
+            {/* Image Upload */}
             <div>
               <label className="block text-sm font-medium text-gray-700">
                 Product Image
@@ -183,14 +156,16 @@ const ProductForm = () => {
             </div>
           </div>
 
+          {/* Submit Button */}
           <div>
             <button
               type="submit"
               className="w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700"
             >
-              Add Product
+              Submit
             </button>
           </div>
+
         </form>
       </div>
     </div>
