@@ -1,8 +1,20 @@
 import React, { useState } from 'react';
 import { Camera } from 'lucide-react';
-import axios from 'axios';
+import Swal from 'sweetalert2';
+import { useNavigate } from 'react-router-dom';
+
+const Alert = ({ type, message }) => {
+  if (!message || type === 'success') return null;
+  
+  return (
+    <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative">
+      {message}
+    </div>
+  );
+};
 
 const ProductForm = () => {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     name: '',
     price: '',
@@ -10,7 +22,7 @@ const ProductForm = () => {
   });
 
   const [previewUrl, setPreviewUrl] = useState('');
-  const [errorMessage, setErrorMessage] = useState('');
+  const [alert, setAlert] = useState({ type: '', message: '' });
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -23,6 +35,14 @@ const ProductForm = () => {
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
+      if (file.size > 10 * 1024 * 1024) {
+        setAlert({
+          type: 'error',
+          message: "File size must be less than 10MB"
+        });
+        return;
+      }
+      
       setFormData((prev) => ({
         ...prev,
         image: file
@@ -34,31 +54,43 @@ const ProductForm = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    // Ensure required fields are filled
+    setAlert({ type: '', message: '' });
+  
+    // Validation
     if (!formData.name || !formData.price || !formData.image) {
-      setErrorMessage("All fields are required.");
+      setAlert({
+        type: 'error',
+        message: "All fields are required."
+      });
       return;
     }
-
-    const data = new FormData(); // Avoid name conflict with state variable
-    data.append("name", formData.name);
-    data.append("price", formData.price);
-    data.append("image", formData.image);
-
-    console.log('Form submitted:', formData);
-
+  
     try {
-      const response = await axios.post('http://localhost:7000/addproduct', data, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
+      // In a real application, you would send the data to your server here
+      // For now, we'll simulate a successful submission
+      
+      // Show success message with SweetAlert2
+      Swal.fire({
+        title: "Success!",
+        text: "Product added successfully!",
+        icon: "success",
+        showConfirmButton: false,
+        timer: 2000
       });
-      console.log(response.data, 'data received');
-      setErrorMessage(""); // Clear errors on successful submission
+      
+      setFormData({ name: '', price: '', image: null });
+      setPreviewUrl('');
+      
+      // Navigate to home page after success
+      setTimeout(() => {
+        navigate('/');
+      }, 2000);
+      
     } catch (error) {
-      console.error("Error submitting form:", error.response ? error.response.data : error.message);
-      setErrorMessage(error.response?.data?.message || "Something went wrong. Please try again.");
+      setAlert({
+        type: 'error',
+        message: error.response?.data?.message || "Something went wrong. Please try again."
+      });
     }
   };
 
@@ -71,13 +103,10 @@ const ProductForm = () => {
           </h2>
         </div>
 
-        {errorMessage && (
-          <div className="text-red-500 text-center">{errorMessage}</div>
-        )}
+        <Alert type={alert.type} message={alert.message} />
 
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
           <div className="rounded-md shadow-sm space-y-4">
-            {/* Name Input */}
             <div>
               <label htmlFor="name" className="block text-sm font-medium text-gray-700">
                 Product Name
@@ -94,7 +123,6 @@ const ProductForm = () => {
               />
             </div>
 
-            {/* Price Input */}
             <div>
               <label htmlFor="price" className="block text-sm font-medium text-gray-700">
                 Price
@@ -118,7 +146,6 @@ const ProductForm = () => {
               </div>
             </div>
 
-            {/* Image Upload */}
             <div>
               <label className="block text-sm font-medium text-gray-700">
                 Product Image
@@ -156,16 +183,14 @@ const ProductForm = () => {
             </div>
           </div>
 
-          {/* Submit Button */}
           <div>
             <button
               type="submit"
               className="w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700"
             >
-              Submit
+              Add Product
             </button>
           </div>
-
         </form>
       </div>
     </div>
