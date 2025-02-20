@@ -64,8 +64,8 @@ const HomeUi = () => {
            >
              <div className="overflow-hidden rounded-lg">
                <img
-                 src={`http://localhost:7000${product.img}`}
-                 alt={product.name}
+                        src={`http://localhost:7000/public/${product.img}`}
+                        alt={product.name}
                  className="w-full h-48 object-cover rounded-lg mb-4 transition-transform duration-300 hover:scale-110"
                />
              </div>
