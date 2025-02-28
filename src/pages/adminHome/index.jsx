@@ -21,7 +21,7 @@ const ProductManagement = () => {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const response = await axios.get("http://localhost:7000/getproduct");
+        const response = await axios.get("/getproduct");
         setProducts(response.data.Data);
       } catch (error) {
         console.error("Error fetching products from backend:", error);
@@ -44,7 +44,7 @@ const ProductManagement = () => {
       price: product.price,
       img: null
     });
-    setPreviewImage(`http://localhost:7000${product.img}`);
+    setPreviewImage(`${product.img}`);
   };
 
   const handleFormChange = (e) => {
@@ -76,7 +76,7 @@ const ProductManagement = () => {
       }
 
       const response = await axios.put(
-        `http://localhost:7000/update-product/${editingProduct._id}`,
+        `/update-product/${editingProduct._id}`,
         formDataToSend,
         {
           headers: {
@@ -86,7 +86,7 @@ const ProductManagement = () => {
       );
 
       if (response.data.success) {
-        const updatedResponse = await axios.get("http://localhost:7000/getproduct");
+        const updatedResponse = await axios.get("/getproduct");
         setProducts(updatedResponse.data.Data);
         setEditingProduct(null);
         Swal.fire('Success!', 'Product updated successfully', 'success');
@@ -112,7 +112,7 @@ const ProductManagement = () => {
       });
 
       if (result.isConfirmed) {
-        const response = await axios.delete(`http://localhost:7000/delete-product/${productId}`);
+        const response = await axios.delete(`/delete-product/${productId}`);
 
         if (response.data.success) {
           setProducts(products.filter(product => product._id !== productId));
@@ -139,9 +139,9 @@ const ProductManagement = () => {
   return (
     <div className="p-4 md:p-6 w-full max-w-6xl mx-auto">
       {/* Header Section */}
-      <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-6 md:mb-8">
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-4 ">
         <Link to="/">
-          <button className="border p-2 rounded-full hover:bg-blue-500 hover:text-white w-full sm:w-auto">
+          <button className="border flex justify-between  border-gray-300 px-2  items-center   rounded-lg hover:bg-blue-500 hover:text-white w-full">
             Home
           </button>
         </Link>
@@ -182,8 +182,8 @@ const ProductManagement = () => {
               <div key={product._id} className="p-4">
                 <div className="flex flex-col gap-4">
                   <img
-                    src={`http://localhost:7000/${product.img}`}
-                    alt={product.name}
+                        src={`/13.211.176.221/public/${product.img}`}
+                        alt={product.name}
                     className="w-full h-48 object-cover rounded-lg"
                   />
                   <div>
@@ -243,7 +243,7 @@ const ProductManagement = () => {
                       {console.log(product.img)
                       }
                       <img
-                        src={`http://localhost:7000/public/${product.img}`}
+                        src={`13.211.176.221/public/${product.img}`}
                         alt={product.name}
                         className="w-24 h-24 object-cover rounded-lg"
                       />
@@ -275,7 +275,6 @@ const ProductManagement = () => {
       </div>
 
       {deleteError && <p className="text-red-500 mt-4">{deleteError}</p>}
-
       {/* Edit Form Modal */}
       {editingProduct && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
